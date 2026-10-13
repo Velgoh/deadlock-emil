@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ==============================================================================
-echo  // YORHA BUILD PROTOCOL // DEADLOCK MACRO COMPILATION
+echo  EMIL BUILD PROTOCOL · MACRO COMPILATION
 echo ==============================================================================
 
 :: Check if cl is already in PATH
@@ -77,7 +77,7 @@ del /q *.obj >nul 2>nul
 
 echo.
 echo ==============================================================================
-echo  // BUILD SUCCESSFUL // DeadlockMacro.exe READY FOR COMBAT
+echo  BUILD SUCCESSFUL · DeadlockMacro.exe READY FOR USE
 echo ==============================================================================
 echo Output file: %~dp0DeadlockMacro.exe
 echo.

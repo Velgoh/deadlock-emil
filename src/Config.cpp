@@ -100,7 +100,7 @@ bool MacroSettings::SaveToFile(const std::string& filepath) const {
     }
 
     file << "; ================================================================\n";
-    file << "; YORHA COMBAT SYSTEM // DEADLOCK MACRO CONFIGURATION\n";
+    file << "; EMIL COMBAT SYSTEM · MACRO CONFIGURATION\n";
     file << "; Auto-generated settings file\n";
     file << "; ================================================================\n\n";
 

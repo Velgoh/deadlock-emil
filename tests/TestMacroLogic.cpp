@@ -414,7 +414,7 @@ void TestShorthandWithSymbols() {
 
 int main() {
     std::cout << "============================================================" << std::endl;
-    std::cout << " YORHA COMBAT SYSTEM // DEADLOCK MACRO TEST SUITE" << std::endl;
+    std::cout << " EMIL COMBAT SYSTEM · MACRO TEST SUITE" << std::endl;
     std::cout << "============================================================" << std::endl;
 
     TEST_RUN(TestUserDefaultSequenceParsing);

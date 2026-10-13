@@ -32,7 +32,7 @@ void MacroEngine::Initialize(const MacroSettings& initialSettings) {
     m_macroEnabled = initialSettings.macroEnabled;
     m_running = true;
 
-    AddLog("YORHA SYSTEM PROTOCOL INITIALIZED // STANDBY", 1);
+    AddLog("EMIL SYSTEM INITIALIZED · STANDBY", 1);
     AddLog("COMBO SEQUENCE LOADED: " + initialSettings.sequenceString, 0);
 
     m_workerThread = std::thread(&MacroEngine::WorkerLoop, this);
@@ -45,7 +45,7 @@ void MacroEngine::Shutdown() {
             m_workerThread.join();
         }
         PanicRelease();
-        AddLog("YORHA PROTOCOL TERMINATED // OFFLINE", 2);
+        AddLog("EMIL SYSTEM TERMINATED · OFFLINE", 2);
     }
 }
 
@@ -85,7 +85,7 @@ void MacroEngine::SetMacroEnabled(bool enabled) {
             sound = m_settings.soundBeepOnToggle;
         }
         if (enabled) {
-            AddLog("SYSTEM STATUS // ENGAGED [ACTIVE]", 1);
+            AddLog("SYSTEM STATUS: ENGAGED [ACTIVE]", 1);
             if (sound) {
                 std::thread([]() {
                     Beep(900, 60);
@@ -94,7 +94,7 @@ void MacroEngine::SetMacroEnabled(bool enabled) {
             }
         } else {
             PanicRelease();
-            AddLog("SYSTEM STATUS // SUSPENDED [OFF]", 2);
+            AddLog("SYSTEM STATUS: SUSPENDED [OFF]", 2);
             if (sound) {
                 std::thread([]() {
                     Beep(1100, 60);
@@ -230,7 +230,7 @@ bool MacroEngine::InterruptibleSleep(int milliseconds, int inputMode) {
         if (!InputManager::IsVkDown(triggerVk)) {
             m_triggerHeld = false;
             PanicRelease();
-            AddLog("TRIGGER RELEASED // IMMEDIATE MID-SEQUENCE ABORT", 0);
+            AddLog("TRIGGER RELEASED · IMMEDIATE MID-SEQUENCE ABORT", 0);
             return false;
         }
 
@@ -286,9 +286,9 @@ void MacroEngine::WorkerLoop() {
         // Log trigger state transitions
         if (triggerHeldNow && !wasTriggerHeldBefore) {
             if (m_macroEnabled) {
-                AddLog("TRIGGER ENGAGED // EXECUTING COMBAT SEQUENCE", 1);
+                AddLog("TRIGGER ENGAGED · EXECUTING COMBAT SEQUENCE", 1);
             } else {
-                AddLog("TRIGGER DETECTED // MACRO IS SUSPENDED [IGNORED]", 0);
+                AddLog("TRIGGER DETECTED · MACRO IS SUSPENDED [IGNORED]", 0);
             }
         }
         wasTriggerHeldBefore = triggerHeldNow;
