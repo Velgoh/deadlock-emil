@@ -1,0 +1,6 @@
+*.obj
+*.exe
+imgui.ini
+*.pdb
+*.ilk
+test_settings_temp.ini
