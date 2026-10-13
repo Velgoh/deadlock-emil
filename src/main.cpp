@@ -202,10 +202,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         // 1. Header Banner (Atlus Angular Stylized Header)
         ImGui::PushFont(g_pTitleFont);
-        AtlusTheme::RenderHeaderBanner(
-            "DEADLOCK // EMIL MACRO",
-            "ATLUS REVOLUTION  ◆  PERSONA / METAPHOR ARCHITECTURE  ◆  STATUS: ACTIVE"
-        );
+        AtlusTheme::RenderHeaderBanner("DEADLOCK // EMIL PROTOCOL", nullptr);
         ImGui::PopFont();
 
         // 2. Tactical HUD Status Row
@@ -301,7 +298,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 ImGui::Spacing();
                 AtlusTheme::RenderSectionDivider("KEY COMBO SPECIFICATION");
 
-                ImGui::TextColored(AtlusTheme::ColNeonViolet, "Sequence Input (Supports shorthand like 123zc or comma separated):");
+                ImGui::TextColored(AtlusTheme::ColNeonViolet, "SEQUENCE INPUT");
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 140.0f);
                 if (ImGui::InputText("##SequenceInput", sequenceBuffer, sizeof(sequenceBuffer))) {
                     settings.sequenceString = sequenceBuffer;
@@ -311,7 +308,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     needDiskSave = true;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Reset Default", ImVec2(130.0f, 0.0f))) {
+                if (ImGui::Button("RESET DEFAULT", ImVec2(130.0f, 0.0f))) {
                     strncpy_s(sequenceBuffer, sizeof(sequenceBuffer), "2, 2, z, z, 2, 2, x, x, 3, 3", _TRUNCATE);
                     settings.sequenceString = sequenceBuffer;
                     settingsLiveChanged = true;
@@ -320,12 +317,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 // Auto Double-Tap Option
                 ImGui::Spacing();
-                if (ImGui::Checkbox("Auto Double-Tap Shorthand", &settings.autoDoubleTap)) {
+                if (ImGui::Checkbox("AUTO DOUBLE-TAP SHORTHAND", &settings.autoDoubleTap)) {
                     settingsLiveChanged = true;
                     needDiskSave = true;
                 }
-                ImGui::SameLine();
-                ImGui::TextColored(AtlusTheme::ColTextMuted, "(Expands shorthand like 123zc into 1,1,2,2,3,3,z,z,c,c)");
 
                 // Sequence validation status
                 std::string parseErr = engine.GetParseError();
@@ -334,7 +329,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 if (!parseErr.empty()) {
                     ImGui::TextColored(AtlusTheme::ColNeonRed, "▲ [PARSE ERROR] %s", parseErr.c_str());
                 } else {
-                    ImGui::TextColored(AtlusTheme::ColNeonGreen, "◆ [READY] %d steps configured.", (int)parsedSteps.size());
+                    ImGui::TextColored(AtlusTheme::ColNeonGreen, "◆ [READY] %d STEPS CONFIGURED", (int)parsedSteps.size());
                 }
 
                 ImGui::Spacing();
@@ -356,14 +351,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 ImGui::Spacing();
                 AtlusTheme::RenderSectionDivider("QUICK PRESETS");
-                if (ImGui::Button("Preset A: Standard Double-Tap (2, 2, z, z, 2, 2, x, x, 3, 3)", ImVec2(520.0f, 32.0f))) {
+                if (ImGui::Button("PRESET A: 2, 2, z, z, 2, 2, x, x, 3, 3", ImVec2(480.0f, 32.0f))) {
                     strncpy_s(sequenceBuffer, sizeof(sequenceBuffer), "2, 2, z, z, 2, 2, x, x, 3, 3", _TRUNCATE);
                     settings.sequenceString = sequenceBuffer;
                     settingsLiveChanged = true;
                     needDiskSave = true;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Preset B: Shorthand Notation (123zc)", ImVec2(340.0f, 32.0f))) {
+                if (ImGui::Button("PRESET B: 123zc (SHORTHAND)", ImVec2(280.0f, 32.0f))) {
                     strncpy_s(sequenceBuffer, sizeof(sequenceBuffer), "123zc", _TRUNCATE);
                     settings.sequenceString = sequenceBuffer;
                     settingsLiveChanged = true;
@@ -378,12 +373,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             // =====================================================================
             if (ImGui::BeginTabItem("  [ 2. TIMINGS & DYNAMICS ]  ")) {
                 ImGui::Spacing();
-                AtlusTheme::RenderSectionDivider("EXECUTION TIMINGS & DELAYS");
+                AtlusTheme::RenderSectionDivider("EXECUTION TIMINGS");
 
                 // Press Delay Slider
-                ImGui::TextColored(AtlusTheme::ColNeonViolet, "Inter-Press Delay (ms):");
-                ImGui::SameLine();
-                ImGui::TextDisabled("(Default: 500 ms)");
+                ImGui::TextColored(AtlusTheme::ColNeonViolet, "INTER-PRESS DELAY");
                 ImGui::SetNextItemWidth(550.0f);
                 if (ImGui::SliderInt("##PressDelay", &settings.pressDelayMs, 30, 2000, "%d ms")) {
                     settingsLiveChanged = true;
@@ -392,9 +385,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 // Key Hold Duration Slider
                 ImGui::Spacing();
-                ImGui::TextColored(AtlusTheme::ColNeonViolet, "Key Hold Duration (ms):");
-                ImGui::SameLine();
-                ImGui::TextDisabled("(Time key is held down)");
+                ImGui::TextColored(AtlusTheme::ColNeonViolet, "KEY HOLD DURATION");
                 ImGui::SetNextItemWidth(550.0f);
                 if (ImGui::SliderInt("##KeyHold", &settings.keyHoldDurationMs, 10, 200, "%d ms")) {
                     settingsLiveChanged = true;
@@ -404,9 +395,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 // Jitter Slider
                 ImGui::Spacing();
                 AtlusTheme::RenderSectionDivider("HUMANIZATION JITTER");
-                ImGui::TextColored(AtlusTheme::ColNeonViolet, "Random Timing Jitter (± ms):");
-                ImGui::SameLine();
-                ImGui::TextDisabled("(Natural variance added to timings)");
+                ImGui::TextColored(AtlusTheme::ColNeonViolet, "TIMING JITTER VARIANCE");
                 ImGui::SetNextItemWidth(550.0f);
                 if (ImGui::SliderInt("##Jitter", &settings.jitterMs, 0, 100, "± %d ms")) {
                     settingsLiveChanged = true;
@@ -415,9 +404,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
                 // Loop Delay Slider
                 ImGui::Spacing();
-                ImGui::TextColored(AtlusTheme::ColNeonViolet, "Loop Restart Delay (ms):");
-                ImGui::SameLine();
-                ImGui::TextDisabled("(Delay before repeating cycle if trigger remains held)");
+                ImGui::TextColored(AtlusTheme::ColNeonViolet, "CYCLE REPEAT DELAY");
                 ImGui::SetNextItemWidth(550.0f);
                 if (ImGui::SliderInt("##LoopDelay", &settings.loopDelayMs, 0, 3000, "%d ms")) {
                     settingsLiveChanged = true;
@@ -427,16 +414,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 // Fast Double-Tap Mode
                 ImGui::Spacing();
                 AtlusTheme::RenderSectionDivider("DOUBLE-TAP ACCELERATION");
-                if (ImGui::Checkbox("Enable Fast Double-Tap Mode", &settings.useFastDoubleTap)) {
+                if (ImGui::Checkbox("FAST DOUBLE-TAP MODE", &settings.useFastDoubleTap)) {
                     settingsLiveChanged = true;
                     needDiskSave = true;
                 }
-                ImGui::SameLine();
-                ImGui::TextDisabled("(Accelerates identical double-taps e.g. 2->2)");
 
                 if (settings.useFastDoubleTap) {
+                    ImGui::Spacing();
+                    ImGui::TextColored(AtlusTheme::ColNeonViolet, "CONFIRMATION TAP DELAY");
                     ImGui::SetNextItemWidth(550.0f);
-                    if (ImGui::SliderInt("Confirmation Tap Delay##DoubleTap", &settings.doubleTapDelayMs, 15, 300, "%d ms")) {
+                    if (ImGui::SliderInt("##DoubleTap", &settings.doubleTapDelayMs, 15, 300, "%d ms")) {
                         settingsLiveChanged = true;
                     }
                     if (ImGui::IsItemDeactivatedAfterEdit()) needDiskSave = true;
@@ -597,11 +584,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
 
                 ImGui::Spacing();
-                AtlusTheme::RenderSectionDivider("OPERATION INSTRUCTIONS");
-                ImGui::BulletText("Hold Mouse Back (XBUTTON1 / M4) to execute combo repetition.");
-                ImGui::BulletText("Releasing trigger key aborts execution instantly.");
-                ImGui::BulletText("Press F6 globally to toggle macro enabled state.");
-                ImGui::BulletText("DirectInput scan codes ensure full compatibility with Deadlock.");
+                AtlusTheme::RenderSectionDivider("CONTROLS");
+                ImGui::BulletText("Hold trigger (M4) to execute combo sequence.");
+                ImGui::BulletText("Release trigger to immediately abort (< 5ms).");
+                ImGui::BulletText("Press F6 to toggle macro state globally.");
+                ImGui::BulletText("Hardware ScanCodes injected via DirectInput.");
 
                 ImGui::EndTabItem();
             }

@@ -381,6 +381,37 @@ void TestShorthandWithNamedKeys() {
     TEST_ASSERT(steps[10].vk == 'C' && steps[11].vk == 'C', "Expected C, C");
 }
 
+// Test 17: Function key with trailing characters (e.g. "F1Z" must decompose into F1 and Z, never swallow Z)
+void TestFunctionKeyTrailingChars() {
+    MacroKeyStep step;
+    // F1Z is NOT a valid function key token by itself
+    TEST_ASSERT(!InputManager::ParseKeyToken("F1Z", step), "ParseKeyToken('F1Z') should return false");
+
+    // In sequence shorthand, "F1Z" should cleanly decompose into F1 and Z
+    std::vector<MacroKeyStep> steps;
+    std::string err;
+    bool ok = InputManager::ParseSequence("F1Z", steps, err, false);
+    TEST_ASSERT(ok, "ParseSequence('F1Z') should succeed: " + err);
+    TEST_ASSERT(steps.size() == 2, "Expected 2 steps from 'F1Z', got " + std::to_string(steps.size()));
+    TEST_ASSERT(steps[0].vk == VK_F1, "Step 0 must be VK_F1");
+    TEST_ASSERT(steps[1].vk == 'Z', "Step 1 must be 'Z'");
+}
+
+// Test 18: Shorthand with printable symbols and brackets (e.g. "123[c")
+void TestShorthandWithSymbols() {
+    std::vector<MacroKeyStep> steps;
+    std::string err;
+
+    bool ok = InputManager::ParseSequence("123[c", steps, err, true);
+    TEST_ASSERT(ok, "ParseSequence('123[c') should succeed: " + err);
+    TEST_ASSERT(steps.size() == 10, "Expected 10 steps from '123[c', got " + std::to_string(steps.size()));
+    TEST_ASSERT(steps[0].vk == '1' && steps[1].vk == '1', "Expected doubled 1");
+    TEST_ASSERT(steps[2].vk == '2' && steps[3].vk == '2', "Expected doubled 2");
+    TEST_ASSERT(steps[4].vk == '3' && steps[5].vk == '3', "Expected doubled 3");
+    TEST_ASSERT(steps[6].label == "[" && steps[7].label == "[", "Expected doubled [");
+    TEST_ASSERT(steps[8].vk == 'C' && steps[9].vk == 'C', "Expected doubled C");
+}
+
 int main() {
     std::cout << "============================================================" << std::endl;
     std::cout << " YORHA COMBAT SYSTEM // DEADLOCK MACRO TEST SUITE" << std::endl;
@@ -402,6 +433,8 @@ int main() {
     TEST_RUN(TestAutoDoubleTapDisabled);
     TEST_RUN(TestMixedShorthandAndDoubled);
     TEST_RUN(TestShorthandWithNamedKeys);
+    TEST_RUN(TestFunctionKeyTrailingChars);
+    TEST_RUN(TestShorthandWithSymbols);
 
     std::cout << "============================================================" << std::endl;
     std::cout << " TEST SUMMARY: " << g_testsPassed << " PASSED, "

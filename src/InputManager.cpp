@@ -240,11 +240,20 @@ bool InputManager::ParseKeyToken(const std::string& rawToken, MacroKeyStep& outS
 
     // Function keys F1 - F24
     if (token.length() >= 2 && token[0] == 'F') {
-        int fNum = std::atoi(token.substr(1).c_str());
-        if (fNum >= 1 && fNum <= 24) {
-            outStep.vk = (WORD)(VK_F1 + (fNum - 1));
-            outStep.scanCode = (WORD)MapVirtualKeyA(outStep.vk, MAPVK_VK_TO_VSC);
-            return true;
+        bool allDigits = true;
+        for (size_t i = 1; i < token.length(); ++i) {
+            if (!std::isdigit((unsigned char)token[i])) {
+                allDigits = false;
+                break;
+            }
+        }
+        if (allDigits) {
+            int fNum = std::atoi(token.substr(1).c_str());
+            if (fNum >= 1 && fNum <= 24) {
+                outStep.vk = (WORD)(VK_F1 + (fNum - 1));
+                outStep.scanCode = (WORD)MapVirtualKeyA(outStep.vk, MAPVK_VK_TO_VSC);
+                return true;
+            }
         }
     }
 
@@ -301,9 +310,9 @@ bool InputManager::ParseSequence(const std::string& sequenceStr, std::vector<Mac
 
             if (matchedSub) continue;
 
-            // Try single alphanumeric character
+            // Try single alphanumeric character or bracket symbol (excluding identifier underscores)
             char c = token[pos];
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+            if (c != '_' && ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '[' || c == ']')) {
                 std::string singleCharStr(1, c);
                 MacroKeyStep subStep;
                 if (ParseKeyToken(singleCharStr, subStep)) {

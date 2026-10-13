@@ -62,7 +62,7 @@ build.bat
 ```
 
 The build script:
-1. Compiles and executes `TestMacroLogic.exe` (16 unit tests covering shorthand parsing, delimiter variants, named keys, auto double-tap logic, hardware scan codes, abort latency, and configuration persistence).
+1. Compiles and executes `TestMacroLogic.exe` (18 unit tests covering shorthand parsing, delimiter variants, named keys, auto double-tap logic, hardware scan codes, abort latency, configuration persistence, function key trailing char isolation, and shorthand bracket/symbol parsing).
 2. Compiles `DeadlockMacro.exe` with `/O2 /MT /std:c++17` linked against DirectX 11.
 
 ---
@@ -86,3 +86,5 @@ Test coverage includes:
 - Config persistence and boundary clamping
 - Abort latency verification (< 25ms SLA)
 - Key release safety panic handler
+- Function key trailing characters isolation (`F1Z` decomposition)
+- Shorthand printable symbols and brackets (`123[c`)
