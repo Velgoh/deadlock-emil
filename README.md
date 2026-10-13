@@ -38,7 +38,7 @@ Features a Dark Purple UI overhaul with generous typography, responsive visual s
 
 | Parameter | Default | Description |
 |---|---|---|
-| **Trigger Key** | `Mouse Back (XBUTTON1 / M4)` | Hold down to run the combo sequence |
+| **Trigger Key** | `Mouse 4 (XBUTTON1)` | Hold down to run the combo sequence |
 | **Master Toggle** | `F6` | Global hotkey to engage or suspend the macro |
 | **Sequence** | `2, 2, z, z, 2, 2, x, x, 3, 3` | Active key sequence string or shorthand |
 | **Auto Double-Tap** | `Enabled` | Expands single shorthand keys to double-taps |

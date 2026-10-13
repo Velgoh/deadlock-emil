@@ -48,30 +48,47 @@ void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static std::wstring GetNierEmilTitle() {
-    static const wchar_t* const titles[] = {
-        L"[E]mil macro",
-        L"e[M]il macro",
-        L"em[I]l macro",
-        L"emi[L] macro",
-        L"emil [M]acro",
-        L"emil m[A]cro",
-        L"emil ma[C]ro",
-        L"emil mac[R]o",
-        L"emil macr[O]",
-    };
-    static const size_t count = sizeof(titles) / sizeof(titles[0]);
-    static size_t lastIdx = 5; // Start with 'emil m[A]cro'
+struct NierEmilEntry {
+    const wchar_t* windowTitle;
+    const char* badge1;
+    const char* badge2;
+};
+
+static const NierEmilEntry kEmilTitleTable[] = {
+    { L"[E]mil macro", "[E]MIL", "MACRO" },
+    { L"e[M]il macro", "E[M]IL", "MACRO" },
+    { L"em[I]l macro", "EM[I]L", "MACRO" },
+    { L"emi[L] macro", "EMI[L]", "MACRO" },
+    { L"emil [M]acro", "EMIL",  "[M]ACRO" },
+    { L"emil m[A]cro", "EMIL",  "M[A]CRO" },
+    { L"emil ma[C]ro", "EMIL",  "MA[C]RO" },
+    { L"emil mac[R]o", "EMIL",  "MAC[R]O" },
+    { L"emil macr[O]", "EMIL",  "MACR[O]" },
+};
+static const size_t kEmilTitleCount = sizeof(kEmilTitleTable) / sizeof(kEmilTitleTable[0]);
+static size_t g_currentEmilIdx = 5; // Default: emil m[A]cro
+
+static void UpdateNierEmilRotation() {
     static ULONGLONG lastTick = 0;
     ULONGLONG now = GetTickCount64();
     if (lastTick == 0) {
         srand((unsigned int)now);
         lastTick = now;
     } else if (now - lastTick > 3500) {
-        lastIdx = (lastIdx + 1 + (rand() % (count - 1))) % count;
+        g_currentEmilIdx = (g_currentEmilIdx + 1 + (rand() % (kEmilTitleCount - 1))) % kEmilTitleCount;
         lastTick = now;
     }
-    return titles[lastIdx];
+}
+
+static std::wstring GetNierEmilTitle() {
+    UpdateNierEmilRotation();
+    return kEmilTitleTable[g_currentEmilIdx].windowTitle;
+}
+
+static void GetNierEmilBadges(const char*& outB1, const char*& outB2) {
+    UpdateNierEmilRotation();
+    outB1 = kEmilTitleTable[g_currentEmilIdx].badge1;
+    outB2 = kEmilTitleTable[g_currentEmilIdx].badge2;
 }
 
 static std::string GetExeDirectory() {
@@ -287,8 +304,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         ImGui::Begin("AtlusMainWindow", nullptr, windowFlags);
 
         // 3. Top Calling Card Header Banner
+        const char* titleBadge1 = "EMIL";
+        const char* titleBadge2 = "M[A]CRO";
+        GetNierEmilBadges(titleBadge1, titleBadge2);
+
         bool toggleSound = false;
-        AtlusTheme::RenderCallingCardHeader("EMIL", "MACRO", nullptr,
+        AtlusTheme::RenderCallingCardHeader(titleBadge1, titleBadge2, nullptr,
                                             "ALL-OUT DIRECTINPUT ENGINE",
                                             isEnabled, settings.soundBeepOnToggle, &toggleSound,
                                             g_pFontImpactHuge, g_pFontImpactButton, g_pFontImpactTag);
@@ -304,7 +325,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             float btnW = (availW - 14.0f) * 0.5f;
 
             if (isEnabled) {
-                if (AtlusTheme::AtlusButton("[ MASTER ENGAGED · PRESS F6 TO SUSPEND ]",
+                if (AtlusTheme::AtlusButton("[ MASTER ENGAGED · F6 ]",
                                             ImVec2(btnW, 46.0f),
                                             AtlusTheme::U32NeonMagenta,
                                             AtlusTheme::U32PureWhite,
@@ -313,7 +334,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     g_ScreenShake.Trigger(0.35f, 9.0f);
                 }
             } else {
-                if (AtlusTheme::AtlusButton("[ ENGAGE MASTER PROTOCOL · F6 ]",
+                if (AtlusTheme::AtlusButton("[ MASTER SUSPENDED · F6 ]",
                                             ImVec2(btnW, 46.0f),
                                             AtlusTheme::U32ObsidianInput,
                                             AtlusTheme::U32NeonRed,
@@ -324,7 +345,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
 
             ImGui::SameLine();
-            if (AtlusTheme::AtlusButton("[ EMERGENCY ABORT & RELEASE ]",
+            if (AtlusTheme::AtlusButton("[ ALL-OUT ABORT ]",
                                         ImVec2(btnW, 46.0f),
                                         AtlusTheme::U32ObsidianInput,
                                         AtlusTheme::U32YellowHighlight,
@@ -359,7 +380,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             if (isRunning) {
                 snprintf(stepStr, sizeof(stepStr), "STEP #%d FIRING", currentStep + 1);
             } else {
-                snprintf(stepStr, sizeof(stepStr), "IDLE / STANDBY");
+                snprintf(stepStr, sizeof(stepStr), "STANDBY");
             }
             AtlusTheme::RenderStatusBadge("SEQUENCE RUNNER", stepStr, isRunning,
                                           isRunning ? AtlusTheme::ColNeonViolet : AtlusTheme::ColTextMuted,
@@ -452,7 +473,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
 
             ImGui::Spacing();
-            if (AtlusTheme::AtlusCheckbox("AUTO DOUBLE-TAP SHORTHAND (123ZC -> 1,1,2,2,3,3,Z,Z,C,C)", &settings.autoDoubleTap, g_pFontImpactTag)) {
+            if (AtlusTheme::AtlusCheckbox("AUTO DOUBLE-TAP SHORTHAND", &settings.autoDoubleTap, g_pFontImpactTag)) {
                 settingsLiveChanged = true;
                 needDiskSave = true;
             }
@@ -500,7 +521,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 needDiskSave = true;
             }
             ImGui::SameLine();
-            if (AtlusTheme::AtlusButton("PRESET 2: 123ZC (SHORTHAND)", ImVec2(270.0f, 34.0f),
+            if (AtlusTheme::AtlusButton("PRESET 2: 123ZC", ImVec2(270.0f, 34.0f),
                                         AtlusTheme::U32ObsidianInput, AtlusTheme::U32PureWhite, g_pFontImpactTag, 6.0f, true)) {
                 strncpy_s(sequenceBuffer, sizeof(sequenceBuffer), "123zc", _TRUNCATE);
                 settings.sequenceString = sequenceBuffer;
@@ -547,7 +568,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             // Slider 3: Jitter Variance
             if (AtlusTheme::AtlusSliderInt("Jitter", "TIMING JITTER VARIANCE", &settings.jitterMs,
-                                          0, 100, "+/- %d MS", g_pFontImpactButton, g_pFontImpactTag)) {
+                                          0, 100, "+- %d MS", g_pFontImpactButton, g_pFontImpactTag)) {
                 settingsLiveChanged = true;
                 needDiskSave = true;
             }
@@ -650,7 +671,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
 
             ImGui::Spacing();
-            AtlusTheme::AtlusTag("DRIVER SPEC: DIRECT HARDWARE SCANCODES · < 5MS ABORT LATENCY ACTIVE",
+            AtlusTheme::AtlusTag("DIRECT HARDWARE SCANCODES · SUB-5MS ABORT LATENCY",
                                  0.0f, AtlusTheme::U32ObsidianInput, AtlusTheme::U32YellowHighlight, g_pFontImpactTag);
         }
 
@@ -745,29 +766,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
 
             ImGui::Spacing();
-            AtlusTheme::AtlusTag("[ COMBAT PROTOCOL SPECS ]", 1.2f,
+            AtlusTheme::AtlusTag("[ COMBAT SPECS ]", 1.2f,
                                  AtlusTheme::U32ElectricPurple, AtlusTheme::U32PureWhite, g_pFontImpactTag);
             ImGui::Spacing();
 
             ImGui::TextColored(AtlusTheme::ColYellowHighlight, "◆");
             ImGui::SameLine();
-            ImGui::Text("HOLD TRIGGER (M4) TO DISPATCH SEQUENCE CYCLES CONTINUOUSLY.");
+            ImGui::Text("TRIGGER: M4 [HOLD TO RUN CONTINUOUSLY]");
 
             ImGui::TextColored(AtlusTheme::ColYellowHighlight, "◆");
             ImGui::SameLine();
-            ImGui::Text("RELEASE TRIGGER FOR IMMEDIATE COMBO ABORT (< 5MS LATENCY).");
+            ImGui::Text("ABORT LATENCY: < 5MS [INSTANT RELEASE]");
 
             ImGui::TextColored(AtlusTheme::ColYellowHighlight, "◆");
             ImGui::SameLine();
-            ImGui::Text("GLOBAL HOTKEY (F6) TOGGLES SYSTEM MASTER STATE SYSTEM-WIDE.");
+            ImGui::Text("GLOBAL MASTER: F6 [HOTKEY TOGGLE]");
 
             ImGui::TextColored(AtlusTheme::ColYellowHighlight, "◆");
             ImGui::SameLine();
-            ImGui::Text("HARDWARE SCANCODES INJECTED DIRECTLY VIA DIRECTINPUT DRIVER.");
+            ImGui::Text("INJECTION: DIRECTINPUT HARDWARE SCANCODES");
 
             ImGui::TextColored(AtlusTheme::ColYellowHighlight, "◆");
             ImGui::SameLine();
-            ImGui::Text("SHORTHAND NOTATION EXPANDS STRINGS (123ZC -> 1,1,2,2,3,3,Z,Z,C,C).");
+            ImGui::Text("SHORTHAND: AUTO DOUBLE-TAP EXPANSION");
         }
 
         ImGui::EndChild(); // CardInnerContent
@@ -789,7 +810,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         AtlusTheme::DrawTextWithFont(drawList, g_pFontImpactTag, 0.0f,
                                      ImVec2(cardMin.x + 16.0f, cardMin.y + cardH + 8.0f),
                                      AtlusTheme::U32YellowHighlight,
-                                     "EMIL COMBAT MACRO · ATLUS METAVERSE DIRECTINPUT");
+                                     "EMIL MACRO · DIRECTINPUT ENGINE");
 
         char rightStatus[128];
         snprintf(rightStatus, sizeof(rightStatus), "STATE: [%s] | CYCLES: %llu | LATENCY: <5MS",
