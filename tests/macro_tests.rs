@@ -95,30 +95,33 @@ fn test_extended_and_mouse_input_parsing() {
     let mut steps = Vec::new();
     let mut err = String::new();
 
-    let seq = "LMB RMB MMB M4 M5 UP DOWN LEFT RIGHT NUM1 NUMPAD5 [ ]";
+    let seq = "LMB RMB MMB M1 M2 M3 M4 M5 UP DOWN LEFT RIGHT NUM1 NUMPAD5 [ ]";
     assert!(InputManager::parse_sequence(seq, &mut steps, &mut err, false), "{}", err);
-    assert_eq!(steps.len(), 13);
+    assert_eq!(steps.len(), 16);
 
     // Mouse
     assert!(steps[0].is_mouse && steps[0].vk == VK_LBUTTON);
     assert!(steps[1].is_mouse && steps[1].vk == VK_RBUTTON);
     assert!(steps[2].is_mouse && steps[2].vk == VK_MBUTTON);
-    assert!(steps[3].is_mouse && steps[3].vk == VK_XBUTTON1);
-    assert!(steps[4].is_mouse && steps[4].vk == VK_XBUTTON2);
+    assert!(steps[3].is_mouse && steps[3].vk == VK_LBUTTON);
+    assert!(steps[4].is_mouse && steps[4].vk == VK_RBUTTON);
+    assert!(steps[5].is_mouse && steps[5].vk == VK_MBUTTON);
+    assert!(steps[6].is_mouse && steps[6].vk == VK_XBUTTON1);
+    assert!(steps[7].is_mouse && steps[7].vk == VK_XBUTTON2);
 
     // Arrows
-    assert!(steps[5].is_extended && steps[5].vk == VK_UP);
-    assert!(steps[6].is_extended && steps[6].vk == VK_DOWN);
-    assert!(steps[7].is_extended && steps[7].vk == VK_LEFT);
-    assert!(steps[8].is_extended && steps[8].vk == VK_RIGHT);
+    assert!(steps[8].is_extended && steps[8].vk == VK_UP);
+    assert!(steps[9].is_extended && steps[9].vk == VK_DOWN);
+    assert!(steps[10].is_extended && steps[10].vk == VK_LEFT);
+    assert!(steps[11].is_extended && steps[11].vk == VK_RIGHT);
 
     // Numpad
-    assert_eq!(steps[9].vk, VK_NUMPAD1);
-    assert_eq!(steps[10].vk, VK_NUMPAD5);
+    assert_eq!(steps[12].vk, VK_NUMPAD1);
+    assert_eq!(steps[13].vk, VK_NUMPAD5);
 
     // Symbols
-    assert_eq!(steps[11].label, "[");
-    assert_eq!(steps[12].label, "]");
+    assert_eq!(steps[14].label, "[");
+    assert_eq!(steps[15].label, "]");
 }
 
 // Test 5: Invalid and edge-case inputs
@@ -436,4 +439,22 @@ fn test_gif_decoding_and_corner_rounding() {
     let player = GifPlayer::load_from_memory(EMBEDDED_ZERO_GIF, 8.0).expect("Failed to decode zero.gif");
     assert_eq!(player.width, 540);
     assert_eq!(player.height, 227);
+
+    // Verify corner pixels are completely transparent (alpha = 0)
+    let first_frame = &player.frames[0].image;
+    // Top-left corner (0, 0)
+    assert_eq!(first_frame.pixels[0].a(), 0, "Top-left corner pixel must be transparent");
+    // Top-right corner (width - 1, 0)
+    assert_eq!(first_frame.pixels[player.width - 1].a(), 0, "Top-right corner pixel must be transparent");
+    // Bottom-left corner (0, height - 1)
+    let bl_idx = (player.height - 1) * player.width;
+    assert_eq!(first_frame.pixels[bl_idx].a(), 0, "Bottom-left corner pixel must be transparent");
+    // Bottom-right corner (width - 1, height - 1)
+    let br_idx = player.height * player.width - 1;
+    assert_eq!(first_frame.pixels[br_idx].a(), 0, "Bottom-right corner pixel must be transparent");
+
+    // Center pixel should remain fully opaque
+    let center_idx = (player.height / 2) * player.width + (player.width / 2);
+    assert_eq!(first_frame.pixels[center_idx].a(), 255, "Center pixel must be fully opaque");
 }
+

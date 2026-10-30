@@ -12,7 +12,7 @@ pub struct FrameData {
 }
 
 pub struct GifPlayer {
-    frames: Vec<FrameData>,
+    pub frames: Vec<FrameData>,
     textures: Vec<Option<TextureHandle>>,
     current_index: usize,
     last_frame_instant: Instant,
@@ -56,7 +56,7 @@ impl GifPlayer {
 
             let pixels: Vec<Color32> = img_buf
                 .pixels()
-                .map(|p| Color32::from_rgba_premultiplied(p[0], p[1], p[2], p[3]))
+                .map(|p| Color32::from_rgba_unmultiplied(p[0], p[1], p[2], p[3]))
                 .collect();
 
             let color_image = ColorImage {
@@ -152,6 +152,9 @@ fn apply_rounded_corners(img: &mut RgbaImage, radius: f32) {
             if dist > r - 1.0 {
                 let pixel = img.get_pixel_mut(x, y);
                 if dist >= r {
+                    pixel[0] = 0;
+                    pixel[1] = 0;
+                    pixel[2] = 0;
                     pixel[3] = 0;
                 } else {
                     let factor = (r - dist).clamp(0.0, 1.0);

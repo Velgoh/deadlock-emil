@@ -48,8 +48,8 @@ impl DeadlockApp {
         let always_on_top = settings.always_on_top;
         let sequence_input = settings.sequence_string.clone();
 
-        // Load Zero GIF with corner rounding mask (radius 8.0px)
-        let gif_player = match GifPlayer::load_from_memory(EMBEDDED_ZERO_GIF, 8.0) {
+        // Load Zero GIF with corner rounding mask (scaled radius 14.0px -> ~8.8px on screen)
+        let gif_player = match GifPlayer::load_from_memory(EMBEDDED_ZERO_GIF, 14.0) {
             Ok(p) => Some(p),
             Err(e) => {
                 eprintln!("Failed to load embedded Zero GIF: {}", e);
@@ -166,11 +166,17 @@ impl DeadlockApp {
             let s = self.engine.get_settings();
             let trigger_name = get_key_name_by_vk(s.trigger_key_vk, TRIGGER_KEY_OPTIONS, "M4");
             let indicator_label = if trigger_name.contains("Mouse 4") {
-                "M4"
+                "M4".to_string()
             } else if trigger_name.contains("Mouse 5") {
-                "M5"
+                "M5".to_string()
+            } else if trigger_name.contains("Mouse 1") {
+                "M1".to_string()
+            } else if trigger_name.contains("Mouse 2") {
+                "M2".to_string()
+            } else if trigger_name.contains("Mouse 3") {
+                "M3".to_string()
             } else {
-                "0"
+                trigger_name.split_whitespace().next().unwrap_or("0").to_string()
             };
 
             let (ind_rect, _) = ui.allocate_exact_size(vec2(44.0, 28.0), Sense::hover());
@@ -325,7 +331,6 @@ impl DeadlockApp {
                 self.sequence_input = current_seq.clone();
                 let mut s = self.engine.get_settings();
                 s.sequence_string = current_seq;
-                s.validate_and_clamp();
                 self.engine.set_settings(s.clone());
                 s.save_to_file(get_default_settings_path());
             }

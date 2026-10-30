@@ -53,21 +53,21 @@ impl InputManager {
 
         // Mouse buttons
         match token.as_str() {
-            "LMB" | "MOUSE1" | "LBUTTON" => {
+            "LMB" | "MOUSE1" | "LBUTTON" | "M1" => {
                 out_step.vk = VK_LBUTTON;
                 out_step.is_mouse = true;
                 out_step.mouse_flags_down = MOUSEEVENTF_LEFTDOWN;
                 out_step.mouse_flags_up = MOUSEEVENTF_LEFTUP;
                 return true;
             }
-            "RMB" | "MOUSE2" | "RBUTTON" => {
+            "RMB" | "MOUSE2" | "RBUTTON" | "M2" => {
                 out_step.vk = VK_RBUTTON;
                 out_step.is_mouse = true;
                 out_step.mouse_flags_down = MOUSEEVENTF_RIGHTDOWN;
                 out_step.mouse_flags_up = MOUSEEVENTF_RIGHTUP;
                 return true;
             }
-            "MMB" | "MOUSE3" | "MBUTTON" => {
+            "MMB" | "MOUSE3" | "MBUTTON" | "M3" => {
                 out_step.vk = VK_MBUTTON;
                 out_step.is_mouse = true;
                 out_step.mouse_flags_down = MOUSEEVENTF_MIDDLEDOWN;
@@ -358,9 +358,9 @@ impl InputManager {
                     continue;
                 }
 
-                // Try single alphanumeric character or bracket symbol
+                // Try single character (alphanumeric and printable ASCII symbols)
                 let c = token.as_bytes()[pos] as char;
-                if c != '_' && (c.is_ascii_alphanumeric() || c == '[' || c == ']') {
+                if c.is_ascii_graphic() && c != '_' {
                     let mut sub_step = MacroKeyStep {
                         label: String::new(),
                         vk: 0,
