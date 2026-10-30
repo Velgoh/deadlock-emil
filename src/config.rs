@@ -46,26 +46,9 @@ impl MacroSettings {
     }
 
     pub fn validate_and_clamp(&mut self) {
-        if self.press_delay_ms < 20 {
-            self.press_delay_ms = 20;
-        }
-        if self.press_delay_ms > 2000 {
-            self.press_delay_ms = 2000;
-        }
-
-        if self.key_hold_duration_ms < 5 {
-            self.key_hold_duration_ms = 5;
-        }
-        if self.key_hold_duration_ms > 500 {
-            self.key_hold_duration_ms = 500;
-        }
-
-        if self.double_tap_delay_ms < 20 {
-            self.double_tap_delay_ms = 20;
-        }
-        if self.double_tap_delay_ms > 1000 {
-            self.double_tap_delay_ms = 1000;
-        }
+        self.press_delay_ms = self.press_delay_ms.clamp(20, 2000);
+        self.key_hold_duration_ms = self.key_hold_duration_ms.clamp(5, 500);
+        self.double_tap_delay_ms = self.double_tap_delay_ms.clamp(20, 1000);
 
         if self.jitter_ms > 200 {
             self.jitter_ms = 200;

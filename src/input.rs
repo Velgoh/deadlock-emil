@@ -471,9 +471,9 @@ impl InputManager {
                     dy: 0,
                     mouseData: if step.mouse_flags_down == MOUSEEVENTF_XDOWN {
                         if step.vk == VK_XBUTTON1 {
-                            XBUTTON1 as u32
+                            XBUTTON1
                         } else {
-                            XBUTTON2 as u32
+                            XBUTTON2
                         }
                     } else {
                         0
@@ -526,9 +526,9 @@ impl InputManager {
                     dy: 0,
                     mouseData: if step.mouse_flags_up == MOUSEEVENTF_XUP {
                         if step.vk == VK_XBUTTON1 {
-                            XBUTTON1 as u32
+                            XBUTTON1
                         } else {
-                            XBUTTON2 as u32
+                            XBUTTON2
                         }
                     } else {
                         0
@@ -590,9 +590,9 @@ impl InputManager {
                         dy: 0,
                         mouseData: if key.mouse_flags_up == MOUSEEVENTF_XUP {
                             if key.vk == VK_XBUTTON1 {
-                                XBUTTON1 as u32
+                                XBUTTON1
                             } else {
-                                XBUTTON2 as u32
+                                XBUTTON2
                             }
                         } else {
                             0

@@ -262,16 +262,16 @@ impl MacroEngine {
                     if loop_delay > 0 && InputManager::is_vk_down(trigger_vk) {
                         let loop_jitter = calculate_jitter(jitter);
                         let actual_loop = (loop_delay as i32 + loop_jitter).max(0) as u32;
-                        if actual_loop > 0 {
-                            if !interruptible_sleep_slice(
+                        if actual_loop > 0
+                            && !interruptible_sleep_slice(
                                 actual_loop,
                                 trigger_vk,
                                 &worker_running,
                                 &worker_macro_enabled,
-                            ) {
-                                InputManager::release_all_simulated_keys(input_mode);
-                                worker_sequence_running.store(false, Ordering::Relaxed);
-                            }
+                            )
+                        {
+                            InputManager::release_all_simulated_keys(input_mode);
+                            worker_sequence_running.store(false, Ordering::Relaxed);
                         }
                     }
                 }
