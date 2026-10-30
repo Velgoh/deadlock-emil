@@ -1,92 +1,62 @@
-# emil m[A]cro
+# Deadlock Macro (v2.0.0)
 
-A lightweight, low-latency Windows input macro utility written in native C++ (DirectX 11 / Dear ImGui).
+A high-performance, minimalist desktop macro utility built natively in Rust using `eframe` / `egui`. Designed specifically for low-latency combat and ability combo sequences in Deadlock.
 
-Features a Dark Purple UI overhaul with generous typography, responsive visual step feedback, shorthand sequence parsing, and sub-5ms trigger abort latency.
+![UI Preview](assets/zero.gif)
 
----
+## Features
 
-## How It Works
+- **Native Rust & egui/eframe Architecture**: Ultra-lightweight, zero bloated web runtimes, instantaneous startup.
+- **Minimalist Dark Aesthetic**: Clean, modern dark UI matching precision framepacer diagnostics (#141414 base, #242424 rounded toolbar buttons).
+- **DirectInput Hardware Scancode Emulation**: Native Win32 `SendInput` hardware scancode dispatch ensuring 100% reliable input registration in Source 2.
+- **Sub-5ms Abort Latency**: Multi-threaded interruptible sleep engine with continuous trigger polling for instantaneous mid-sequence cancellation upon trigger release.
+- **Custom Vector Glyphs**: High-fidelity, scalable vector icons (Settings Drawer, Mode Toggle, Pin / Always-On-Top, Trigger Indicator, Arm Toggle).
+- **Smooth Anti-Aliased Corner Masking**: Embedded companion GIF (`zero.gif`) with mathematical corner clipping ensuring zero corner overflow.
+- **Auto Double-Tap Expansion**: Automatically doubles single abilities into rapid double-taps (e.g. shorthand `123zc` or `23zx`) while smartly preserving existing pairs without quadruple expansion.
+- **Humanized Timing & Jitter Variance**: Configurable press delays, key hold durations, loop delays, and uniform timing jitter variance.
+- **Full Configuration Persistence**: Automatically saves and loads configuration from `settings.ini`.
 
-1. **Input Parser & Shorthand Notation**:
-   - Accepts both delimited sequences (`1, 1, 2, 2, 3, 3, z, z, c, c`) and shorthand strings (`123zc`).
-   - When **Auto Double-Tap** is enabled, single shorthand characters are automatically expanded into confirmation double-taps (`123zc` becomes `1, 1, 2, 2, 3, 3, z, z, c, c`).
-   - Already-doubled pairs are recognized and preserved without quadruple expansion.
-   - Supported delimiters include commas, spaces, semicolons, arrows (`->`), and vertical pipes (`|`).
+## Key Controls
 
-2. **Trigger-Held Execution & Immediate Abort**:
-   - The sequence fires continuously as long as the configured trigger key (default: `Mouse Back / M4`) is held down.
-   - Releasing the trigger key immediately aborts the active sequence in `< 5ms` and releases any held keys to prevent stuck inputs.
-
-3. **Timing Engine & Randomization**:
-   - Inter-press delay: Configurable delay between sequential keypresses (default: 500 ms).
-   - Key hold duration: Actuation duration for each keypress (default: 35 ms).
-   - Timing jitter: Configurable randomized variance (default: ±25 ms) applied to timings to prevent robotic cadences.
-   - Fast double-tap mode: Allows setting a custom rapid delay for double-tap pairs.
-
-4. **Hardware ScanCode Injection**:
-   - Inputs are dispatched through the Windows `SendInput` API using `KEYEVENTF_SCANCODE` rather than virtual key codes, ensuring reliable registration in games that read DirectInput hardware scans directly.
-
-5. **Interface**:
-   - Dark purple color scheme (`#0a0714` background, `#140d24` cards, electric purple and neon magenta highlights, high-contrast text).
-   - Skewed cards, tilted ransom-style badges, diamond sliders, and dynamic step visualization.
-   - Dynamic window title alternating through NieR ending bracket variations (`emil m[A]cro`, `[E]mil macro`, etc.).
-
----
-
-## Default Controls & Configuration
-
-| Parameter | Default | Description |
+| Control | Default | Description |
 |---|---|---|
-| **Trigger Key** | `Mouse 4 (XBUTTON1)` | Hold down to run the combo sequence |
-| **Master Toggle** | `F6` | Global hotkey to engage or suspend the macro |
-| **Sequence** | `2, 2, z, z, 2, 2, x, x, 3, 3` | Active key sequence string or shorthand |
-| **Auto Double-Tap** | `Enabled` | Expands single shorthand keys to double-taps |
-| **Inter-Press Delay** | `500 ms` | Cadence between sequential inputs |
-| **Key Hold Duration** | `35 ms` | Physical hold duration per input |
-| **Timing Jitter** | `± 25 ms` | Randomized variance applied to timings |
-| **Input Driver** | `Hardware ScanCode` | DirectInput scancode injection |
+| **Trigger Key** | `Mouse 4` (`XBUTTON1`) | Hold to execute the active macro sequence. Releasing aborts in <5ms. |
+| **Global Toggle Hotkey** | `F6` | Toggle the macro between Armed and Standby. |
+| **Settings Drawer** | `≡` (Hamburger) | Expand settings drawer for timing adjustments, trigger keys, and modes. |
+| **Mode Toggle** | `⊞` (Grid) | Toggle between Hardware ScanCode (Source 2) and VirtualKey mode. |
+| **Pin Toggle** | `📌` (Pin) | Toggle always-on-top window layering. |
+| **Double-Tap Toggle** | `2x Tap: ON/OFF` | Toggle auto double-tap shorthand expansion. |
 
-Settings are automatically persisted to and reloaded from `settings.ini`.
+## Sequence Syntax
 
----
+The sequence parser accepts both shorthand and delimited formats:
+
+- **Shorthand**: `123zc`, `23zx`, `112233zzcc`
+- **Delimited**: `1, 1, 2, 2, z, z`, `2 -> 2 -> z -> z`, `1 2 3 z c`, `2;2;z;z`
+- **Named Keys**: `SPACE`, `LSHIFT`, `LCTRL`, `TAB`, `ESC`, `F1` - `F12`, `UP`, `DOWN`, `LEFT`, `RIGHT`
+- **Mouse Buttons**: `LMB`, `RMB`, `MMB`, `M4`, `M5`
 
 ## Building from Source
 
-Requires Visual Studio 2022 (Community, Professional, or Build Tools):
+### Prerequisites
 
-```cmd
-build.bat
+- [Rust Toolchain](https://rustup.rs/) (1.75+ or later)
+- Windows 10 / 11
+
+### Compile
+
+```bash
+cargo build --release
 ```
 
-The build script will:
-1. Compile and run the unit test suite (`TestMacroLogic.exe`), verifying all 18 test cases.
-2. Compile the standalone executable (`DeadlockMacro.exe`) with `/O2 /MT /std:c++17` linked against DirectX 11.
+The compiled standalone executable will be located at `target/release/DeadlockMacro.exe`.
 
----
+### Run Tests
 
-## Running Tests
-
-Run the test suite directly:
-
-```cmd
-TestMacroLogic.exe
+```bash
+cargo test
 ```
 
-The test suite covers:
-- Key sequence parsing with standard and custom delimiters
-- Shorthand token expansion (`123zc` -> 10 steps)
-- Protection against duplicate expansion for pre-doubled sequences
-- Named keys and mouse buttons (`SPACE`, `LSHIFT`, `M4`, `M5`, `F1`–`F24`)
-- DirectInput scan code mappings
-- Configuration persistence and boundary clamping
-- Abort latency SLA (< 25ms) and key release panic safety
-- Trailing character handling on multi-character tokens
+## License
 
----
-
-## Support
-
-For issues, bug reports, or feature suggestions, please open an issue on GitHub.
-
-Glory to mankind.
+MIT License.

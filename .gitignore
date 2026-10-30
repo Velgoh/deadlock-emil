@@ -1,6 +1,8 @@
+/target
+/core
 *.obj
 *.exe
-imgui.ini
 *.pdb
 *.ilk
+imgui.ini
 test_settings_temp.ini
