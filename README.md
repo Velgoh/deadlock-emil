@@ -57,6 +57,13 @@ The compiled standalone executable will be located at `target/release/DeadlockMa
 cargo test
 ```
 
+## Support
+
+For issues, bug reports, or feature suggestions, please open an issue on GitHub.
+
+Glory to mankind.
+
 ## License
 
 MIT License.
+
